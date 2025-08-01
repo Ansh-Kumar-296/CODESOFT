@@ -1,49 +1,33 @@
-package intern;
 import java.util.*;
 public class StudentGradeCalculator {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter the number of subjects: ");
-        int subjects = sc.nextInt();
-
-        int totalMarks = 0;
-
-        for (int i = 1; i <= subjects; i++) {
-            System.out.print("Enter marks for subject " + i + " (out of 100): ");
-            int marks = sc.nextInt();
-
-            while (marks < 0 || marks > 100) {
-                System.out.println("Invalid marks! Enter a value between 0 and 100.");
-                marks = sc.nextInt();
-            }
-
-            totalMarks += marks;
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Enter the number of subjects");
+        int n=sc.nextInt();
+        int sum=0;
+        for(int i=1;i<=n;i++){
+            System.out.println("Enter the marks for Subject "+i);
+            int marks=sc.nextInt();
+            sum+=marks;
         }
-
-        double average = (double) totalMarks / subjects;
-
+        int per=sum/n;
         String grade;
-        if (average >= 90) {
-            grade = "A+";
-        } else if (average >= 80) {
-            grade = "A";
-        } else if (average >= 70) {
-            grade = "B";
-        } else if (average >= 60) {
-            grade = "C";
-        } else if (average >= 50) {
-            grade = "D";
-        } else {
-            grade = "F (Fail)";
-        }
-
-        System.out.println("            RESULT           ");
-        System.out.println("-----------------------------");
-        System.out.println("Total Marks: " + totalMarks + " out of " + (subjects * 100));
-        System.out.println("Average Percentage: " + average + "%");
-        System.out.println("Grade: " + grade);
+        if(per>=90)
+            grade="A+";
+        else if(per>=80 && per<90)
+            grade="A";
+        else if(per>=70 && per<80)
+            grade="B+";
+        else if(per>=60 && per<70)
+            grade="B";
+        else if(per>=50 && per<60)
+            grade="C+";
+        else if(per>=40 && per<50)
+            grade="C";
+        else
+            grade="D";
+        System.out.println("Total Marks="+sum);
+        System.out.println("Percentage="+per+"%");
+        System.out.println("Grade:"+grade);
     }
 }
-
-
