@@ -3,64 +3,64 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
-public class CurrencyConverter {
+class CurrencyConverter {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Currency Converter");
+        System.out.println("-------Currency Converter-------");
         System.out.print("Enter base currency (e.g., USD): ");
-        String from = scanner.nextLine().toUpperCase();
+        String base = scanner.nextLine().toUpperCase();
 
         System.out.print("Enter target currency (e.g., INR): ");
-        String to = scanner.nextLine().toUpperCase();
+        String target = scanner.nextLine().toUpperCase();
 
-        System.out.print("Enter amount to convert: ");
-        double amount = scanner.nextDouble();
+        System.out.print("Enter the amount to be converted: ");
+        double amountToConvert = scanner.nextDouble();
 
         try {
-            double convertedAmount = convertCurrency(from, to, amount);
-            System.out.printf("%.2f %s = %.2f %s\n", amount, from, convertedAmount, to);
-        } catch (Exception e) {
-            System.out.println("Error fetching exchange rate: " + e.getMessage());
+            double convertedAmount = fetchConvertedAmount(base, target, amountToConvert);
+            System.out.printf("%.2f %s = %.2f %s\n", amountToConvert, base, convertedAmount, target);
+        } catch (Exception error) {
+            System.out.println("Sorry, Couldn't fetch the exchange rate. " + error.getMessage());
         }
+        System.out.println("Thank You!!");
+
+        scanner.close();
     }
 
-    public static double convertCurrency(String from, String to, double amount) throws IOException {
-    String urlStr = String.format(
-        "https://api.frankfurter.app/latest?amount=%f&from=%s&to=%s",
-        amount, from, to
-    );
+    public static double fetchConvertedAmount(String base, String target, double amt) throws IOException {
+        String apiUrl = String.format(
+            "https://api.frankfurter.app/latest?amount=%f&from=%s&to=%s",
+            amt, base, target
+        );
 
-    HttpURLConnection con = (HttpURLConnection) new URL(urlStr).openConnection();
-    con.setRequestMethod("GET");
+        HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
+        connection.setRequestMethod("GET");
 
-    BufferedReader in = new BufferedReader(
-        new InputStreamReader(con.getInputStream())
-    );
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder responseBuilder = new StringBuilder();
+        String line;
 
-    StringBuilder content = new StringBuilder();
-    String inputLine;
-    while ((inputLine = in.readLine()) != null)
-        content.append(inputLine);
+        while ((line = reader.readLine()) != null) {
+            responseBuilder.append(line);
+        }
 
-    in.close();
-    con.disconnect();
+        reader.close();
+        connection.disconnect();
 
-    String json = content.toString();
-    System.out.println("API Response:\n" + json);
+        String jsonResponse = responseBuilder.toString();
+        System.out.println("API Response: " + jsonResponse);
 
-    // Extract "to" currency value using regex
-    String pattern = String.format("\"%s\"\\s*:\\s*(-?\\d+(\\.\\d+)?)", to);
-    Pattern r = Pattern.compile(pattern);
-    Matcher m = r.matcher(json);
+        String regex = String.format("\"%s\"\\s*:\\s*(-?\\d+(\\.\\d+)?)", target);
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(jsonResponse);
 
-    if (m.find()) {
-        return Double.parseDouble(m.group(1));
-    } else {
-        throw new IOException("Could not parse result from API");
+        if (matcher.find()) {
+            return Double.parseDouble(matcher.group(1));
+        } else {
+            throw new IOException("Couldn't read the conversion result from the API response.");
+        }
+        
     }
-}
-
-
 }
